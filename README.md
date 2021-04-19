@@ -1,4 +1,4 @@
-# caspersign-validator-ui
+# caspersign-app-ui
 
 ## :construction: Building
 
