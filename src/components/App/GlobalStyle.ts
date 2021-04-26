@@ -149,6 +149,23 @@ const Style = createGlobalStyle`
     border-color: ${cerulean};
     color: ${cerulean};
   }
+  .ant-steps-vertical > .ant-steps-item:not(:last-child) > .ant-steps-item-container > .ant-steps-item-tail {
+    left: 50%;
+  }
+  .ant-steps-vertical > .ant-steps-item .ant-steps-item-icon {
+    position: absolute;
+    left: 50%;
+    margin-left: -15px;
+  }
+  .ant-steps-item-title {
+    padding-right: 0;
+  }
+  .ant-steps-item-wait > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-description {
+    color: black;
+  }
+  .ant-steps-item-wait > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title {
+    text-transform: uppercase;
+  }
 
 `;
 
