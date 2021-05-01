@@ -1,16 +1,22 @@
 import React from "react";
+import { Redirect } from "react-router-dom";
 import styled from "styled-components";
 import { Card, Layout, Typography, Button, Space, Steps } from "antd";
-import { skyblue } from "../colors";
+
 import shield from "../../img/shield.svg";
+import { useAuthContext } from "../../hooks";
+import { skyblue } from "../colors";
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
 
 function Signup() {
+  const { isAuthenticated } = useAuthContext();
+
   return (
     <Layout>
       <Main>
+        {isAuthenticated && <Redirect to="/documents" />}
         <Card style={{ margin: "30px 0" }}>
           <Space direction="vertical">
             <ShieldIcon>

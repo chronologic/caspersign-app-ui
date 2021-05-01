@@ -3,20 +3,29 @@ import styled from "styled-components";
 import { Layout, Menu, Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 
+import { useAuthContext } from "../../hooks";
+
 function Header() {
+  const { isAuthenticated, email, onLogout } = useAuthContext();
+
   const menu = (
     <Menu>
-      <Menu.Item key="1">Logout</Menu.Item>
+      <Menu.Item key="1" onClick={onLogout}>
+        Logout
+      </Menu.Item>
     </Menu>
   );
+
   return (
     <Layout.Header>
       <HeaderContent>
-        <Dropdown trigger={["click"]} overlay={menu}>
-          <LoginButton>
-            your@gmail.com <DownOutlined />
-          </LoginButton>
-        </Dropdown>
+        {isAuthenticated && (
+          <Dropdown trigger={["click"]} overlay={menu}>
+            <LoginButton>
+              {email} <DownOutlined />
+            </LoginButton>
+          </Dropdown>
+        )}
       </HeaderContent>
     </Layout.Header>
   );
