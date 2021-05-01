@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { API_URL } from "../env";
-import { IUser, PaginatedDocuments } from "../types";
+import { DocumentUploadFormData, IUser, PaginatedDocuments } from "../types";
 
 const client = axios.create({
   baseURL: API_URL,
@@ -28,6 +28,19 @@ const api = {
         headers: getAuthHeader(),
       }
     );
+
+    return data;
+  },
+  async createAndSend(form: DocumentUploadFormData): Promise<any> {
+    const formData = new FormData();
+    formData.append("file", form.file);
+    form.signers.forEach((signer) => {
+      formData.append("signers[]", JSON.stringify(signer));
+    });
+
+    const { data } = await client.post(`/documents`, formData, {
+      headers: getAuthHeader(),
+    });
 
     return data;
   },

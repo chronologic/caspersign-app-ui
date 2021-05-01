@@ -39,3 +39,11 @@ export interface SignatureSummary {
   txHash: string;
   signedAt: string;
 }
+
+export interface DocumentUploadFormData {
+  file: File;
+  signers: {
+    name: string;
+    email_address: string;
+  }[];
+}
