@@ -1,12 +1,15 @@
 import React, { useCallback, useMemo } from "react";
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import { Table, Layout, Typography, Badge, Tooltip } from "antd";
+import { Table, Layout, Typography, Badge, Tooltip, Button } from "antd";
 import { TablePaginationConfig } from "antd/lib/table";
 import ReactTimeAgo from "react-time-ago";
+import { FormOutlined } from "@ant-design/icons";
 
 import { skyblue, applegreen, cerise } from "../colors";
 import { useDocumentList } from "../../hooks";
 import { DocumentStatus, SignatureSummary } from "../../types";
+import FlexSpacer from "../FlexSpacer";
 
 const { Title, Text } = Typography;
 
@@ -90,55 +93,13 @@ const columns = [
   },
 ];
 
-const data = [
-  {
-    key: "1",
-    status: (
-      <div>
-        <Badge color={skyblue} /> AWAITING MY SIGNATURE
-      </div>
-    ),
-    signatures: <Text style={{ color: skyblue }}>0 / 3</Text>,
-    title: "Example_HS_signed_completed_Referral_Agreement",
-    date: "April 20, 2021",
-  },
-  {
-    key: "2",
-    status: (
-      <div>
-        <Badge color={applegreen} /> COMPLETED
-      </div>
-    ),
-    signatures: <Text style={{ color: applegreen }}>3 / 3</Text>,
-    title: "Example_HS_signed_completed_Referral_Agreement",
-    date: "April 20, 2021",
-  },
-  {
-    key: "3",
-    status: (
-      <div>
-        <Badge color={applegreen} /> COMPLETED
-      </div>
-    ),
-    signatures: <Text style={{ color: skyblue }}>1 / 3</Text>,
-    title: "Example_HS_signed_completed_Referral_Agreement",
-    date: "April 20, 2021",
-  },
-  {
-    key: "4",
-    status: (
-      <div>
-        <Badge color={cerise} /> OUT FOR SIGNATURE
-      </div>
-    ),
-    signatures: <Text style={{ color: skyblue }}>2 / 3</Text>,
-    title: "Example_HS_signed_completed_Referral_Agreement",
-    date: "April 20, 2021",
-  },
-];
-
 function DocumentList() {
   const { loading, items, meta, onPaginationChange } = useDocumentList();
+  const history = useHistory();
+
+  const handleCreateDocument = useCallback(() => {
+    history.push("/documents/new");
+  }, [history]);
 
   const handleTableChange = useCallback(
     ({ pageSize, current }: any) => {
@@ -164,6 +125,10 @@ function DocumentList() {
       <Main>
         <HeaderTitle>
           <Title level={4}>Documents</Title>
+          <FlexSpacer />
+          <Button size="large" type="primary" onClick={handleCreateDocument}>
+            <FormOutlined /> Sign documents
+          </Button>
         </HeaderTitle>
         <Table
           rowKey="documentUid"
@@ -190,6 +155,9 @@ const Main = styled.div`
 
 const HeaderTitle = styled.div`
   margin: 64px 0 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
 export default DocumentList;

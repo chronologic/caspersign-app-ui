@@ -167,6 +167,12 @@ const Style = createGlobalStyle`
     text-transform: uppercase;
   }
 
+  .ant-btn-primary:not([disabled]) {
+    background: ${skyblue};
+    border-color: ${skyblue};
+  }
+
+
 `;
 
 export default Style;
