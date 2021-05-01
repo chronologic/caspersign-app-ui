@@ -1,8 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
 
 import reportWebVitals from "./reportWebVitals";
 import App from "./components/App";
+
+TimeAgo.setDefaultLocale("en");
+TimeAgo.addLocale(en);
 
 ReactDOM.render(
   <React.StrictMode>

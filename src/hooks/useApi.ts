@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { message } from "antd";
 
 import { apiService } from "../services";
@@ -12,34 +12,38 @@ export default function useApi() {
     apiService.setOauthToken(token);
   }, [token]);
 
-  const api = {
-    ...apiService,
-    async oauth(code: string, state: string): Promise<string> {
-      try {
-        const res = await apiService.oauth(code, state);
-        onAuthenticated(res);
-        apiService.setOauthToken(res.oauthToken);
-        return res.email;
-      } catch (err) {
-        onLogout();
-        message.error(err.message);
-        return "";
-      }
-    },
-    async listDocuments(
-      page: number,
-      pageSize: number
-    ): Promise<PaginatedDocuments> {
-      try {
-        const res = await apiService.listDocuments(page, pageSize);
-        return res;
-      } catch (err) {
-        onLogout();
-        message.error(err.message);
-        return {} as PaginatedDocuments;
-      }
-    },
-  };
+  const api = useMemo(
+    () => ({
+      ...apiService,
+      async oauth(code: string, state: string): Promise<string> {
+        try {
+          const res = await apiService.oauth(code, state);
+          onAuthenticated(res);
+          apiService.setOauthToken(res.oauthToken);
+          return res.email;
+        } catch (err) {
+          onLogout();
+          message.error(err.message);
+          return "";
+        }
+      },
+      async listDocuments(
+        page: number,
+        pageSize: number
+      ): Promise<PaginatedDocuments> {
+        try {
+          const res = await apiService.listDocuments(page, pageSize);
+          return res;
+        } catch (err) {
+          console.log(err);
+          // onLogout();
+          message.error(err.message);
+          return {} as PaginatedDocuments;
+        }
+      },
+    }),
+    [onAuthenticated, onLogout]
+  );
 
   return api;
 }

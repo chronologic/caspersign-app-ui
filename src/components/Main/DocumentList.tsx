@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import styled from "styled-components";
 import { Table, Layout, Typography, Badge, Tooltip } from "antd";
+import { TablePaginationConfig } from "antd/lib/table";
+import ReactTimeAgo from "react-time-ago";
+
 import { skyblue, applegreen, cerise } from "../colors";
+import { useDocumentList } from "../../hooks";
+import { DocumentStatus, SignatureSummary } from "../../types";
 
 const { Title, Text } = Typography;
 
@@ -9,20 +14,70 @@ const columns = [
   {
     title: <Text strong>HelloSign status</Text>,
     dataIndex: "status",
-    render: (status: any) => (
-      <Tooltip placement="top" title="Click to see on HelloSign">
-        {status}
-      </Tooltip>
-    ),
+    render: (status: DocumentStatus) => {
+      let formattedStatus: React.ReactNode = status;
+
+      switch (status) {
+        case DocumentStatus.AWAITING_MY_SIGNATURE: {
+          formattedStatus = (
+            <div>
+              <Badge color={skyblue} /> AWAITING MY SIGNATURE
+            </div>
+          );
+          break;
+        }
+        case DocumentStatus.COMPLETED: {
+          formattedStatus = (
+            <div>
+              <Badge color={applegreen} /> COMPLETED
+            </div>
+          );
+          break;
+        }
+        case DocumentStatus.OUT_FOR_SIGNATURE: {
+          formattedStatus = (
+            <div>
+              <Badge color={cerise} /> OUT FOR SIGNATURE
+            </div>
+          );
+          break;
+        }
+        default: {
+          formattedStatus = status;
+        }
+      }
+
+      return (
+        <Tooltip placement="top" title="Click to see on HelloSign">
+          <div style={{ display: "inline-block", cursor: "pointer" }}>
+            {formattedStatus}
+          </div>
+        </Tooltip>
+      );
+    },
   },
   {
     title: <Text strong>CasperSign signatures</Text>,
     dataIndex: "signatures",
-    render: (signatures: any) => (
-      <Tooltip placement="top" title="Click to see the details">
-        {signatures}
-      </Tooltip>
-    ),
+    render: (signatures: SignatureSummary[]) => {
+      const completedCount = signatures.filter((sig) => sig.completed).length;
+      const totalCount = signatures.length;
+      const isFullyCompleted = completedCount === totalCount;
+
+      return (
+        <Tooltip placement="top" title="Click to see the details">
+          <div
+            style={{
+              color: isFullyCompleted ? applegreen : skyblue,
+              cursor: "pointer",
+              display: "inline-block",
+            }}
+          >
+            {completedCount} / {totalCount}
+          </div>
+        </Tooltip>
+      );
+    },
   },
   {
     title: <Text strong>Title</Text>,
@@ -30,7 +85,8 @@ const columns = [
   },
   {
     title: <Text strong>Date</Text>,
-    dataIndex: "date",
+    dataIndex: "createdAt",
+    render: (createdAt: string) => <ReactTimeAgo date={createdAt} />,
   },
 ];
 
@@ -82,13 +138,42 @@ const data = [
 ];
 
 function DocumentList() {
+  const { loading, items, meta, onPaginationChange } = useDocumentList();
+
+  const handleTableChange = useCallback(
+    ({ pageSize, current }: any) => {
+      onPaginationChange({ page: current, pageSize });
+    },
+    [onPaginationChange]
+  );
+
+  const paginationConfig: TablePaginationConfig = useMemo(
+    () => ({
+      current: meta.page,
+      pageSize: meta.pageSize,
+      total: meta.total,
+      pageSizeOptions: ["10", "25", "50", "100"],
+      showSizeChanger: true,
+      showTotal: (total, [from, to]) => `${from}-${to} of ${total}`,
+    }),
+    [meta]
+  );
+
   return (
     <Layout>
       <Main>
         <HeaderTitle>
           <Title level={4}>Documents</Title>
         </HeaderTitle>
-        <Table columns={columns} dataSource={data} />
+        <Table
+          rowKey="documentUid"
+          columns={columns}
+          dataSource={items}
+          pagination={paginationConfig}
+          loading={loading}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onChange={handleTableChange as any}
+        />
       </Main>
     </Layout>
   );
