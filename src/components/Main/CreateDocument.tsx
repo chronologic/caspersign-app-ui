@@ -2,23 +2,22 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
-import { Card, Typography, Button, Input, Upload, Form } from "antd";
+import { Card, Typography, Button, Input, Upload, Form, message } from "antd";
 import { InboxOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 
-import {
-  useAuthContext,
-  useCreateDocument,
-  useHeaderContent,
-} from "../../hooks";
+import { DocumentUploadFormData } from "../../types";
+import { useApi, useAuthContext, useHeaderContent } from "../../hooks";
 
 const { Title, Text } = Typography;
 
 function CreateDocument() {
-  const { email } = useAuthContext();
-  const { loading, form, onSubmit } = useCreateDocument();
-  const { setContent } = useHeaderContent();
   const history = useHistory();
+  const [form] = Form.useForm();
+  const { email } = useAuthContext();
+  const { setContent } = useHeaderContent();
+  const { createAndSend } = useApi();
   const [addMe, setAddMe] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [extraSignersCount, setExtraSignersCount] = useState(0);
 
   const meName = useMemo(() => {
@@ -34,22 +33,41 @@ function CreateDocument() {
 
   const handleAddMe = useCallback(() => {
     setAddMe(true);
-    setTimeout(
-      () =>
-        form.setFieldsValue({
-          "signers.meName": meName,
-          "signers.meEmail": email,
-        }),
-      1000
-    );
-  }, [email, form, meName]);
+  }, []);
   const handleDontAddMe = useCallback(() => {
     setAddMe(false);
   }, []);
 
+  const handleSubmit = useCallback(async () => {
+    setLoading(true);
+    try {
+      const fields = await form.validateFields();
+      const data: DocumentUploadFormData = {
+        file: fields.file,
+        signers: fields.signers,
+        title: fields.title,
+        message: fields.message,
+      };
+      if (fields.meName) {
+        data.signers.unshift({
+          name: fields.meName,
+          email_address: fields.meEmail,
+        });
+      }
+      const res = await createAndSend(fields);
+      message.success("Sent document for signing");
+      form.resetFields();
+      history.push("/documents");
+      return res;
+    } finally {
+      setLoading(false);
+    }
+  }, [createAndSend, form, history]);
+
   const handleGoBack = useCallback(() => {
     history.goBack();
   }, [history]);
+
   const headerContent = useMemo(
     () => (
       <CreateDocButtons>
@@ -65,13 +83,13 @@ function CreateDocument() {
           type="primary"
           size="large"
           loading={loading}
-          onClick={onSubmit}
+          onClick={handleSubmit}
         >
           Send for signature
         </Button>
       </CreateDocButtons>
     ),
-    [handleGoBack, loading, onSubmit]
+    [handleGoBack, handleSubmit, loading]
   );
 
   useEffect(() => {
