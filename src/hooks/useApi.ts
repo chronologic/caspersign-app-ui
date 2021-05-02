@@ -12,8 +12,8 @@ export default function useApi() {
     apiService.setOauthToken(token);
   }, [token]);
 
-  const api = useMemo(
-    () => ({
+  const api = useMemo(() => {
+    return {
       ...apiService,
       async oauth(code: string, state: string): Promise<string> {
         try {
@@ -27,23 +27,29 @@ export default function useApi() {
           return "";
         }
       },
-      async listDocuments(
-        page: number,
-        pageSize: number
-      ): Promise<PaginatedDocuments> {
+      listDocuments: with401Handler(apiService.listDocuments),
+      createAndSend: with401Handler(apiService.createAndSend),
+    };
+
+    function with401Handler<T>(fn: T): T {
+      const wrapped: any = async (...args: any[]) => {
         try {
-          const res = await apiService.listDocuments(page, pageSize);
+          const res = await (fn as any)(...args);
           return res;
         } catch (err) {
-          console.log(err);
-          // onLogout();
-          message.error(err.message);
+          if (err?.response?.status === 401) {
+            onLogout();
+            message.error("Your session expired");
+          } else {
+            message.error(err.message);
+          }
           return {} as PaginatedDocuments;
         }
-      },
-    }),
-    [onAuthenticated, onLogout]
-  );
+      };
+
+      return wrapped as T;
+    }
+  }, [onAuthenticated, onLogout]);
 
   return api;
 }
