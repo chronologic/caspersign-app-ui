@@ -92,6 +92,20 @@ function CreateDocument() {
     [handleGoBack, handleSubmit, loading]
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const addFirstElement = useCallback(
+    (() => {
+      let done = false;
+      return (fields: any[], add: (name?: string, index?: number) => void) => {
+        if (!done && fields.length === 0) {
+          done = true;
+          setTimeout(() => add());
+        }
+      };
+    })(),
+    []
+  );
+
   useEffect(() => {
     setContent(headerContent);
   }, [headerContent, setContent]);
@@ -295,17 +309,6 @@ const CreateDocButtons = styled.div`
     margin-right: 15px;
   }
 `;
-
-let done = false;
-function addFirstElement(
-  fields: any[],
-  add: (name?: string, index?: number) => void
-): void {
-  if (!done && fields.length === 0) {
-    done = true;
-    setTimeout(() => add());
-  }
-}
 
 function getFileFromEvent(e: any): File {
   return e.file;

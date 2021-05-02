@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useCallback, useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -8,7 +10,7 @@ import { FormOutlined } from "@ant-design/icons";
 
 import { skyblue, applegreen, cerise } from "../colors";
 import { useDocumentList } from "../../hooks";
-import { DocumentStatus, SignatureSummary } from "../../types";
+import { DocumentStatus, DocumentSummary, SignatureSummary } from "../../types";
 import FlexSpacer from "../FlexSpacer";
 
 const { Title, Text } = Typography;
@@ -52,7 +54,12 @@ const columns = [
 
       return (
         <Tooltip placement="top" title="Click to see on HelloSign">
-          <div style={{ display: "inline-block", cursor: "pointer" }}>
+          <div
+            style={{ display: "inline-block", cursor: "pointer" }}
+            onClick={() =>
+              window.open("https://app.hellosign.com/home/manage", "_blank")
+            }
+          >
             {formattedStatus}
           </div>
         </Tooltip>
@@ -62,7 +69,7 @@ const columns = [
   {
     title: <Text strong>CasperSign signatures</Text>,
     dataIndex: "signatures",
-    render: (signatures: SignatureSummary[]) => {
+    render: (signatures: SignatureSummary[], row: DocumentSummary) => {
       const completedCount = signatures.filter((sig) => sig.completed).length;
       const totalCount = signatures.length;
       const isFullyCompleted = completedCount === totalCount;
@@ -75,6 +82,11 @@ const columns = [
               cursor: "pointer",
               display: "inline-block",
             }}
+            onClick={() =>
+              window.open(
+                `https://validate.caspersign.io?hash=${row.documentUid}`
+              )
+            }
           >
             {completedCount} / {totalCount}
           </div>

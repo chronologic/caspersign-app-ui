@@ -34,6 +34,8 @@ const api = {
   async createAndSend(form: DocumentUploadFormData): Promise<any> {
     const formData = new FormData();
     formData.append("file", form.file);
+    formData.append("title", form.title);
+    formData.append("message", form.message || "");
     form.signers.forEach((signer) => {
       formData.append("signers[]", JSON.stringify(signer));
     });
