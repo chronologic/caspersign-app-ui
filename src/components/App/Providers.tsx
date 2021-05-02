@@ -1,7 +1,11 @@
 import React from "react";
 import { QueryParamProvider } from "use-query-params";
 
-import { AuthProvider, CreateDocumentProvider } from "../../contexts";
+import {
+  AuthProvider,
+  CreateDocumentProvider,
+  HeaderContentProvider,
+} from "../../contexts";
 
 interface IProps {
   children: React.ReactNode;
@@ -10,7 +14,9 @@ interface IProps {
 const Providers = ({ children }: IProps) => (
   <QueryParamProvider>
     <AuthProvider>
-      <CreateDocumentProvider>{children}</CreateDocumentProvider>
+      <HeaderContentProvider>
+        <CreateDocumentProvider>{children}</CreateDocumentProvider>
+      </HeaderContentProvider>
     </AuthProvider>
   </QueryParamProvider>
 );

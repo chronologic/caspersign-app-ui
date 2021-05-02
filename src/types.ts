@@ -42,6 +42,8 @@ export interface SignatureSummary {
 
 export interface DocumentUploadFormData {
   file: File;
+  title: string;
+  message?: string;
   signers: {
     name: string;
     email_address: string;

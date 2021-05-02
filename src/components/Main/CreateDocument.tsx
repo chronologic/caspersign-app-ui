@@ -1,15 +1,82 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { Card, Typography, Button, Input, Upload, Form } from "antd";
 import { InboxOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 
-import { useCreateDocument } from "../../hooks";
+import {
+  useAuthContext,
+  useCreateDocument,
+  useHeaderContent,
+} from "../../hooks";
 
 const { Title, Text } = Typography;
 
 function CreateDocument() {
-  const { loading, form } = useCreateDocument();
+  const { email } = useAuthContext();
+  const { loading, form, onSubmit } = useCreateDocument();
+  const { setContent } = useHeaderContent();
+  const history = useHistory();
+  const [addMe, setAddMe] = useState(false);
+  const [extraSignersCount, setExtraSignersCount] = useState(0);
+
+  const meName = useMemo(() => {
+    let name = email.split("@")[0];
+    name = name.split(".").join(" ");
+    name = name.split("+").join(" ");
+    name = name
+      .split(" ")
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .join(" ");
+    return name;
+  }, [email]);
+
+  const handleAddMe = useCallback(() => {
+    setAddMe(true);
+    setTimeout(
+      () =>
+        form.setFieldsValue({
+          "signers.meName": meName,
+          "signers.meEmail": email,
+        }),
+      1000
+    );
+  }, [email, form, meName]);
+  const handleDontAddMe = useCallback(() => {
+    setAddMe(false);
+  }, []);
+
+  const handleGoBack = useCallback(() => {
+    history.goBack();
+  }, [history]);
+  const headerContent = useMemo(
+    () => (
+      <CreateDocButtons>
+        <Button
+          type="ghost"
+          size="large"
+          disabled={loading}
+          onClick={handleGoBack}
+        >
+          Back
+        </Button>
+        <Button
+          type="primary"
+          size="large"
+          loading={loading}
+          onClick={onSubmit}
+        >
+          Send for signature
+        </Button>
+      </CreateDocButtons>
+    ),
+    [handleGoBack, loading, onSubmit]
+  );
+
+  useEffect(() => {
+    setContent(headerContent);
+  }, [headerContent, setContent]);
 
   return (
     <Main>
@@ -49,16 +116,51 @@ function CreateDocument() {
               </Form.Item>
             </Form.Item>
           </Card>
+          <Form.Item
+            label="Document title"
+            name="title"
+            rules={[{ required: true, message: "Document title is required" }]}
+          >
+            <Input type="text" maxLength={200} />
+          </Form.Item>
         </What>
         <Who>
           <Title level={4}>Who needs to sign?</Title>
           <Text className="subtitle">Add signers</Text>
+          {addMe && (
+            <Signer>
+              <Form.Item
+                label="Name"
+                name="meName"
+                initialValue={meName}
+                rules={[{ required: true, message: "Name is required" }]}
+              >
+                <Input type="text" />
+              </Form.Item>
+              <Form.Item
+                label="Email address"
+                name="meEmail"
+                initialValue={email}
+                rules={[{ required: true, message: "Email is required" }]}
+              >
+                <Input type="email" />
+              </Form.Item>
+              {extraSignersCount > 0 && (
+                <CloseOutlined
+                  className="removeSigner"
+                  onClick={handleDontAddMe}
+                />
+              )}
+            </Signer>
+          )}
           <Form.List name="signers">
             {(fields, { add, remove }) => (
               <>
                 {addFirstElement(fields, add)}
+                {extraSignersCount !== fields.length &&
+                  setTimeout(() => setExtraSignersCount(fields.length))}
                 {fields.map((field, i) => (
-                  <div key={field.key} className="signer">
+                  <Signer key={field.key}>
                     <Form.Item
                       {...field}
                       key={`${field.key}name`}
@@ -79,11 +181,13 @@ function CreateDocument() {
                     >
                       <Input type="email" />
                     </Form.Item>
-                    <CloseOutlined
-                      className="removeSigner"
-                      onClick={() => remove(i)}
-                    />
-                  </div>
+                    {(extraSignersCount > 1 || addMe) && (
+                      <CloseOutlined
+                        className="removeSigner"
+                        onClick={() => remove(i)}
+                      />
+                    )}
+                  </Signer>
                 ))}
                 <Button
                   type="dashed"
@@ -98,9 +202,19 @@ function CreateDocument() {
               </>
             )}
           </Form.List>
-          <Button type="dashed" className="addButton" icon={<PlusOutlined />}>
-            Add me as a signer
-          </Button>
+          {!addMe && (
+            <Button
+              type="dashed"
+              className="addButton"
+              icon={<PlusOutlined />}
+              onClick={handleAddMe}
+            >
+              Add me as a signer
+            </Button>
+          )}
+          <Form.Item label="Message (optional)" name="message">
+            <Input.TextArea rows={4} />
+          </Form.Item>
         </Who>
       </Form>
     </Main>
@@ -126,37 +240,43 @@ const Main = styled.div`
     margin-bottom: 16px;
     text-align: left;
   }
-
-  .signer {
-    display: flex;
-    flex-direction: row;
-    background: #fafafa;
-    margin-bottom: 16px;
-    position: relative;
-
-    .ant-row {
-      flex-basis: 50%;
-      padding: 8px 16px;
-    }
-
-    .removeSigner {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      color: darkgrey;
-
-      &:hover {
-        color: gray;
-      }
-    }
-  }
 `;
 
 const What = styled.section``;
 
 const Who = styled.section``;
+
+const Signer = styled.div`
+  display: flex;
+  flex-direction: row;
+  background: #fafafa;
+  margin-bottom: 16px;
+  position: relative;
+
+  .ant-row {
+    flex-basis: 50%;
+    padding: 8px 16px;
+  }
+
+  .removeSigner {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    color: darkgrey;
+
+    &:hover {
+      color: gray;
+    }
+  }
+`;
+
+const CreateDocButtons = styled.div`
+  .ant-btn:not(:last-child) {
+    margin-right: 15px;
+  }
+`;
 
 let done = false;
 function addFirstElement(
