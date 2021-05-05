@@ -19,8 +19,10 @@ const Style = createGlobalStyle`
   .ant-layout-header {
     background: white;
     box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
-    position: relative;
     padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 9;
   }
   .ant-layout-footer {
     padding: 0 24px 12px;

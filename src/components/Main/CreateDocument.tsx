@@ -19,6 +19,8 @@ function CreateDocument() {
   const [addMe, setAddMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [extraSignersCount, setExtraSignersCount] = useState(0);
+  const [invalidFile, setInvalidFile] = useState(false);
+  const [fileName, setFileName] = useState("");
 
   const meName = useMemo(() => {
     let name = email.split("@")[0];
@@ -106,6 +108,22 @@ function CreateDocument() {
     []
   );
 
+  const handleDragEnterFile = useCallback((event) => {
+    const fileType = event.dataTransfer?.items[0]?.type;
+    setInvalidFile(fileType !== "application/pdf");
+  }, []);
+
+  const getFileFromEvent = useCallback((e) => {
+    if (!e.file.status) {
+      setFileName(e.file.name);
+    }
+    return e.file;
+  }, []);
+
+  const handleRemoveFileName = useCallback(() => {
+    setFileName("");
+  }, []);
+
   useEffect(() => {
     setContent(headerContent);
   }, [headerContent, setContent]);
@@ -116,38 +134,50 @@ function CreateDocument() {
         <What>
           <Title level={4}>What needs to be signed?</Title>
           <Text className="subtitle">Select document</Text>
-          <Card>
-            <Form.Item>
-              <Form.Item
-                name="file"
-                valuePropName="file"
-                getValueFromEvent={getFileFromEvent}
-                noStyle
-                rules={[
-                  {
-                    required: true,
-                    message: "Document is required",
-                  },
-                ]}
-              >
-                <Upload.Dragger
+          <div
+            className={invalidFile ? "invalidFile" : ""}
+            onDragEnter={handleDragEnterFile}
+          >
+            <Card>
+              <Form.Item>
+                <Form.Item
                   name="file"
-                  action=""
-                  multiple={false}
-                  beforeUpload={() => false}
-                  disabled={loading}
+                  valuePropName="file"
+                  getValueFromEvent={getFileFromEvent}
+                  noStyle
+                  rules={[
+                    {
+                      required: true,
+                      message: "Document is required",
+                    },
+                  ]}
                 >
-                  <p className="ant-upload-drag-icon">
-                    <InboxOutlined />
-                  </p>
-                  <p className="ant-upload-text">Upload a PDF document here</p>
-                  <p className="ant-upload-hint">
-                    Upload or drop your signed document here in the dropzone
-                  </p>
-                </Upload.Dragger>
+                  <Upload.Dragger
+                    name="file"
+                    accept="application/pdf"
+                    action=""
+                    multiple={false}
+                    beforeUpload={() => false}
+                    disabled={loading}
+                    onRemove={handleRemoveFileName}
+                  >
+                    <p className="ant-upload-drag-icon">
+                      <InboxOutlined />
+                    </p>
+                    <p className="ant-upload-text">
+                      {invalidFile
+                        ? "Only PDF files are accepted!"
+                        : fileName || "Upload a PDF document here"}
+                    </p>
+                    <p className="ant-upload-hint">
+                      {!fileName &&
+                        "Upload or drop your signed document here in the dropzone"}
+                    </p>
+                  </Upload.Dragger>
+                </Form.Item>
               </Form.Item>
-            </Form.Item>
-          </Card>
+            </Card>
+          </div>
           <Form.Item
             label="Document title"
             name="title"
@@ -272,6 +302,17 @@ const Main = styled.div`
     margin-bottom: 16px;
     text-align: left;
   }
+
+  .invalidFile {
+    .ant-upload-drag-icon .anticon {
+      transition: color 0.3s ease;
+      color: red !important;
+    }
+    .ant-form-item .ant-upload.ant-upload-drag {
+      transition: background-color 0.3s ease;
+      background-color: mistyrose;
+    }
+  }
 `;
 
 const What = styled.section``;
@@ -309,9 +350,5 @@ const CreateDocButtons = styled.div`
     margin-right: 15px;
   }
 `;
-
-function getFileFromEvent(e: any): File {
-  return e.file;
-}
 
 export default CreateDocument;
