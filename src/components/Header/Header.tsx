@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { Layout, Menu, Dropdown, Button } from "antd";
+import { Layout, Menu, Dropdown, Space } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import logo from "../../img/logo.svg";
 
+import logo from "../../img/logo.svg";
 import { useAuthContext, useHeaderContent } from "../../hooks";
 import FlexSpacer from "../FlexSpacer";
 
@@ -12,6 +12,10 @@ function Header() {
   const { isAuthenticated, email, onLogout } = useAuthContext();
   const { content, setDefaultContent, resetContent } = useHeaderContent();
   const location = useLocation();
+
+  const handleClick = useCallback(() => {
+    window.location.href = window.location.origin;
+  }, []);
 
   const defaultContent = useMemo(() => {
     const menu = (
@@ -44,9 +48,11 @@ function Header() {
   return (
     <Layout.Header>
       <HeaderContent>
-        <Logo>
-          <img src={logo} alt="logo" />
-        </Logo>
+        <Space>
+          <Logo onClick={handleClick}>
+            <img src={logo} alt="logo" />
+          </Logo>
+        </Space>
         <FlexSpacer />
         {content}
       </HeaderContent>
@@ -56,6 +62,7 @@ function Header() {
 
 const Logo = styled.div`
   width: 150px;
+  cursor: pointer;
 `;
 
 const LoginButton = styled.div`
@@ -64,18 +71,17 @@ const LoginButton = styled.div`
   font-size: 16px;
   line-height: 20px;
   margin-left: auto;
-  margin-top: 20px;
 `;
 
 const HeaderContent = styled.div`
   display: flex;
+  flex-direction: row;
+  align-items: center;
   width: 100%;
   max-width: 1170px;
   padding-right: 15px;
   padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-  text-align: center;
+  margin: 0 auto;
 `;
 
 export default Header;
