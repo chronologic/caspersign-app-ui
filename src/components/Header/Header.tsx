@@ -3,6 +3,7 @@ import { useLocation, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { Layout, Menu, Dropdown, Button } from "antd";
 import { DownOutlined } from "@ant-design/icons";
+import logo from "../../img/logo.svg";
 
 import { useAuthContext, useHeaderContent } from "../../hooks";
 import FlexSpacer from "../FlexSpacer";
@@ -43,12 +44,19 @@ function Header() {
   return (
     <Layout.Header>
       <HeaderContent>
+        <Logo>
+          <img src={logo} alt="logo" />
+        </Logo>
         <FlexSpacer />
         {content}
       </HeaderContent>
     </Layout.Header>
   );
 }
+
+const Logo = styled.div`
+  width: 150px;
+`;
 
 const LoginButton = styled.div`
   cursor: pointer;
