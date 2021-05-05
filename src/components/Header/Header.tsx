@@ -61,12 +61,13 @@ const LoginButton = styled.div`
 
 const HeaderContent = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: center;
   width: 100%;
   max-width: 1170px;
   padding-right: 15px;
   padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
 `;
 
 export default Header;
