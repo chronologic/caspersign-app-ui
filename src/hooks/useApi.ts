@@ -39,7 +39,7 @@ export default function useApi() {
         } catch (err) {
           if (err?.response?.status === 401) {
             onLogout();
-            message.error("Your session expired");
+            message.error("Your session has expired. Please log in again.");
           } else {
             message.error(err.message);
           }
