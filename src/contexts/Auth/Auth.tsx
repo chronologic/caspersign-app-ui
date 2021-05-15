@@ -28,11 +28,11 @@ const AuthProvider: React.FC<IProps> = ({ children }: IProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
-  const onAuthenticated = useCallback((user?: IUser) => {
+  const onAuthenticated = useCallback((user?: IUser | null) => {
     setIsAuthenticated(!!user);
     setEmail(user?.email || "");
     setToken(user?.oauthToken || "");
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user || null));
   }, []);
   const onLogout = useCallback(() => {
     localStorage.removeItem(USER_STORAGE_KEY);
@@ -40,7 +40,7 @@ const AuthProvider: React.FC<IProps> = ({ children }: IProps) => {
   }, []);
 
   useEffect(() => {
-    let user: IUser | undefined = JSON.parse(
+    let user: IUser | null = JSON.parse(
       localStorage.getItem(USER_STORAGE_KEY) || "null"
     );
     let logoutTimeout: NodeJS.Timeout;
@@ -50,7 +50,7 @@ const AuthProvider: React.FC<IProps> = ({ children }: IProps) => {
         new Date().getTime();
 
       if (timeToExpiration <= 0) {
-        user = undefined;
+        user = null;
       } else {
         logoutTimeout = setTimeout(onLogout, timeToExpiration);
       }
