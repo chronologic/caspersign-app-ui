@@ -40,9 +40,28 @@ const AuthProvider: React.FC<IProps> = ({ children }: IProps) => {
   }, []);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || "null");
+    let user: IUser | undefined = JSON.parse(
+      localStorage.getItem(USER_STORAGE_KEY) || "null"
+    );
+    let logoutTimeout: NodeJS.Timeout;
+    if (user) {
+      const timeToExpiration = new Date(
+        user.oauthTokenExpirationDate
+      ).getTime();
+      new Date().getTime();
+
+      if (timeToExpiration <= 0) {
+        user = undefined;
+      } else {
+        logoutTimeout = setTimeout(onLogout, timeToExpiration);
+      }
+    }
     onAuthenticated(user);
-  }, [onAuthenticated]);
+
+    return () => {
+      clearTimeout(logoutTimeout);
+    };
+  }, [onAuthenticated, onLogout]);
 
   return (
     <AuthContext.Provider

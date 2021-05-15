@@ -1,6 +1,7 @@
 export interface IUser {
   email: string;
   oauthToken: string;
+  oauthTokenExpirationDate: string;
 }
 
 export enum DocumentStatus {
