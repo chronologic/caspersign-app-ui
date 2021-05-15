@@ -45,10 +45,9 @@ const AuthProvider: React.FC<IProps> = ({ children }: IProps) => {
     );
     let logoutTimeout: NodeJS.Timeout;
     if (user) {
-      const timeToExpiration = new Date(
-        user.oauthTokenExpirationDate
-      ).getTime();
-      new Date().getTime();
+      const timeToExpiration =
+        new Date(user.oauthTokenExpirationDate).getTime() -
+        new Date().getTime();
 
       if (timeToExpiration <= 0) {
         user = undefined;
