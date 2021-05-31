@@ -6,7 +6,9 @@ This repository holds the UI for initiating and sending out documents to be sign
 
 The live version can be found [here](https://app.caspersign.io/).
 
-## Environment variables
+Featured as the "First Casper-Native Dapp"  https://blog.casperlabs.io/the-first-casper-native-dapp-is-here-caspersign-allows-users-to-sign-contracts-confidentially-securely/ 
+
+## 🔧 Environment variables
 
 This repo uses [`dotenv`](https://www.npmjs.com/package/dotenv) to load environment variables.
 
