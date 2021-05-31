@@ -13,10 +13,6 @@ function Header() {
   const { content, setDefaultContent, resetContent } = useHeaderContent();
   const location = useLocation();
 
-  const href = useMemo(() => {
-    return window.location.origin;
-  }, []);
-
   const defaultContent = useMemo(() => {
     const menu = (
       <Menu>
@@ -49,7 +45,7 @@ function Header() {
     <Layout.Header>
       <HeaderContent>
         <Space>
-          <a href={href}>
+          <a href={window.location.origin}>
             <Logo>
               <img src={logo} alt="logo" />
             </Logo>
