@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { Layout, Menu, Dropdown, Space } from "antd";
@@ -13,8 +13,8 @@ function Header() {
   const { content, setDefaultContent, resetContent } = useHeaderContent();
   const location = useLocation();
 
-  const handleClick = useCallback(() => {
-    window.location.href = window.location.origin;
+  const href = useMemo(() => {
+    return window.location.origin;
   }, []);
 
   const defaultContent = useMemo(() => {
@@ -49,9 +49,11 @@ function Header() {
     <Layout.Header>
       <HeaderContent>
         <Space>
-          <Logo onClick={handleClick}>
-            <img src={logo} alt="logo" />
-          </Logo>
+          <a href={href}>
+            <Logo>
+              <img src={logo} alt="logo" />
+            </Logo>
+          </a>
         </Space>
         <FlexSpacer />
         {content}
