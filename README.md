@@ -6,7 +6,17 @@ This repository holds the UI for initiating and sending out documents to be sign
 
 The live version can be found [here](https://app.caspersign.io/).
 
-Featured as the "First Casper-Native Dapp"  https://blog.casperlabs.io/the-first-casper-native-dapp-is-here-caspersign-allows-users-to-sign-contracts-confidentially-securely/ 
+Featured as the "First Casper-Native Dapp" https://blog.casperlabs.io/the-first-casper-native-dapp-is-here-caspersign-allows-users-to-sign-contracts-confidentially-securely/
+
+## Project overview
+
+The CasperSign project consists of the following repositories:
+
+https://github.com/chronologic/caspersign-app-ui (this repository)
+https://github.com/chronologic/caspersign-validator-ui
+https://github.com/chronologic/caspersign-signer-ui
+https://github.com/chronologic/caspersign-server
+https://github.com/chronologic/caspersign-contract
 
 ## 🔧 Environment variables
 
