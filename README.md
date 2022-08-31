@@ -7,6 +7,7 @@ This repository holds the UI for initiating and sending out documents to be sign
 The live version can be found [here](https://app.caspersign.io/).
 
 Featured as the "First Casper-Native Dapp" https://blog.casperlabs.io/the-first-casper-native-dapp-is-here-caspersign-allows-users-to-sign-contracts-confidentially-securely/
+https://twitter.com/Casper_Network/status/1392482766139363328
 
 ## Project overview
 
